@@ -1,6 +1,6 @@
-# LLM-Guided Cache Side-Channel Leakage Testing
+# LLM-Assisted Cache Leakage Pattern Analysis
 
-This project is a controlled prototype for **LLM-assisted cache side-channel test generation and simulator-based validation**.
+This project is a controlled prototype for **LLM-assisted cache leakage pattern analysis and simulator-based validation**.
 
 The goal is **not** to implement a real hardware attack. The goal is to show a safe workflow where LLM/paper-inspired victim leakage patterns are reviewed, encoded as executable JSON scenarios, and validated in a simplified Prime+Probe-style cache timing simulator.
 
