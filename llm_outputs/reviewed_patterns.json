@@ -1,0 +1,99 @@
+{
+  "review_version": "reviewed_patterns_v1",
+  "purpose": "Document how raw LLM-assisted pattern candidates were reviewed before entering executable simulator scenario files.",
+  "important_scope_note": "This file is documentation for the review workflow. The simulator does not read it directly; it reads scenarios/llm_extracted_patterns.json and scenarios/defense_scenarios.json.",
+  "review_policy": {
+    "vulnerable_victim_pattern": "May be accepted into scenarios/llm_extracted_patterns.json if it can be represented as an abstract victim address trace under the fixed Prime+Probe-style observation model.",
+    "mitigation_candidate": "May be accepted into scenarios/defense_scenarios.json if it corresponds to a clear no-defense baseline and a supported mitigation pattern.",
+    "attack_observation_method_only": "Recorded only in literature notes because the current prototype fixes the attack observation method as Prime+Probe.",
+    "unsupported_or_out_of_scope": "Rejected unless future work extends the simulator."
+  },
+  "accepted_vulnerable_patterns": [
+    {
+      "candidate_id": "raw_table_lookup_001",
+      "final_scenario_name": "secret_dependent_table_lookup",
+      "final_destination": "scenarios/llm_extracted_patterns.json",
+      "review_decision": "accepted",
+      "review_notes": "Directly supported as table_lookup. Kept as the canonical vulnerable table lookup scenario."
+    },
+    {
+      "candidate_id": "raw_multi_table_002",
+      "final_scenario_name": "multi_table_lookup_footprint",
+      "final_destination": "scenarios/llm_extracted_patterns.json",
+      "review_decision": "accepted",
+      "review_notes": "Supported as multi_table_lookup. Simplified to a deterministic multi-set footprint."
+    },
+    {
+      "candidate_id": "raw_branch_003",
+      "final_scenario_name": "secret_dependent_branch_footprint",
+      "final_destination": "scenarios/llm_extracted_patterns.json",
+      "review_decision": "accepted_with_scope_note",
+      "review_notes": "Accepted only as branch/code-footprint leakage. It does not model branch prediction, speculation, or full control-flow attacks."
+    },
+    {
+      "candidate_id": "raw_loop_count_004",
+      "final_scenario_name": "secret_dependent_loop_count",
+      "final_destination": "scenarios/llm_extracted_patterns.json",
+      "review_decision": "accepted_with_scope_note",
+      "review_notes": "Accepted as cache-footprint-size leakage. Total runtime timing is not separately modeled."
+    },
+    {
+      "candidate_id": "raw_set_aliasing_005",
+      "final_scenario_name": "set_aliasing_table_lookup",
+      "final_destination": "scenarios/llm_extracted_patterns.json",
+      "review_decision": "accepted",
+      "review_notes": "Useful partial-leakage scenario showing that Prime+Probe observes sets rather than exact addresses."
+    }
+  ],
+  "accepted_mitigations": [
+    {
+      "candidate_id": "raw_constant_scan_006",
+      "final_scenario_names": [
+        "table_lookup_constant_time_scan",
+        "multi_table_constant_time_footprint",
+        "branch_balanced_footprint",
+        "loop_count_fixed_count_padding"
+      ],
+      "final_destination": "scenarios/defense_scenarios.json",
+      "review_decision": "accepted_as_general_constant_footprint_principle",
+      "review_notes": "The same principle is adapted to each vulnerable pattern: make the cache-visible footprint independent of the secret."
+    },
+    {
+      "candidate_id": "raw_random_padding_007",
+      "final_scenario_names": [
+        "table_lookup_random_padding"
+      ],
+      "final_destination": "scenarios/defense_scenarios.json",
+      "review_decision": "accepted_as_weak_mitigation",
+      "review_notes": "Kept as a partial mitigation example. It reduces leakage but is not expected to eliminate it."
+    },
+    {
+      "candidate_id": "raw_partitioning_008",
+      "final_scenario_names": [
+        "table_lookup_partitioned_cache"
+      ],
+      "final_destination": "scenarios/defense_scenarios.json",
+      "review_decision": "accepted_as_system_level_mitigation",
+      "review_notes": "Modeled using monitored_sets so the attacker observes sets 0-3 while victim accesses sets 4-7."
+    }
+  ],
+  "paper_sources_only": [
+    {
+      "candidate_id": "raw_prime_probe_method_009",
+      "review_decision": "record_only",
+      "review_notes": "Prime+Probe is the fixed observation method of the prototype, not a victim pattern scenario."
+    },
+    {
+      "candidate_id": "raw_flush_reload_method_010",
+      "review_decision": "record_only_out_of_scope",
+      "review_notes": "Flush+Reload is a different observation method and is out of scope for the current Prime+Probe simulator."
+    }
+  ],
+  "rejected_candidates": [
+    {
+      "candidate_id": "raw_spectre_gadget_011",
+      "review_decision": "rejected_out_of_scope",
+      "review_notes": "Transient/speculative execution is not modeled by this trace-driven cache-set simulator."
+    }
+  ]
+}

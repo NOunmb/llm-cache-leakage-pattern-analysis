@@ -1,0 +1,134 @@
+[
+  {
+    "name": "table_lookup_no_defense",
+    "pattern_type": "table_lookup",
+    "secret_space": 4,
+    "expected_leakage": "high",
+    "defense_group": "table_lookup",
+    "case_type": "no_defense",
+    "source_inspiration": "Base leakage case: secret-dependent table lookup maps different secret values to attacker-monitored cache sets.",
+    "parameters": {
+      "victim_tag": 10
+    }
+  },
+  {
+    "name": "table_lookup_constant_time_scan",
+    "pattern_type": "constant_time_scan",
+    "secret_space": 4,
+    "expected_leakage": "low",
+    "defense_group": "table_lookup",
+    "case_type": "program_level_defense",
+    "source_inspiration": "Constant-time access mitigation for table lookup: access all candidate locations regardless of the secret.",
+    "parameters": {
+      "victim_tag": 10
+    }
+  },
+  {
+    "name": "table_lookup_random_padding",
+    "pattern_type": "random_padding",
+    "secret_space": 4,
+    "expected_leakage": "medium",
+    "defense_group": "table_lookup",
+    "case_type": "program_level_mitigation",
+    "source_inspiration": "Random padding mitigation for table lookup: add random extra memory accesses, but keep the original secret-dependent access.",
+    "parameters": {
+      "victim_tag": 10,
+      "padding_count": 3
+    }
+  },
+  {
+    "name": "table_lookup_partitioned_cache",
+    "pattern_type": "partitioned_cache",
+    "secret_space": 4,
+    "expected_leakage": "low",
+    "defense_group": "table_lookup",
+    "case_type": "system_level_mitigation",
+    "source_inspiration": "Cache partitioning-style mitigation for table lookup: attacker monitors sets 0-3, while secret-dependent victim accesses are mapped to sets 4-7.",
+    "monitored_sets": [0, 1, 2, 3],
+    "parameters": {
+      "victim_tag": 10,
+      "victim_set_offset": 4
+    }
+  },
+  {
+    "name": "multi_table_no_defense",
+    "pattern_type": "multi_table_lookup",
+    "secret_space": 4,
+    "expected_leakage": "high",
+    "defense_group": "multi_table_lookup",
+    "case_type": "no_defense",
+    "source_inspiration": "Base leakage case: table-driven code touches multiple secret-dependent table entries, creating a wider cache footprint.",
+    "parameters": {
+      "victim_tag": 20,
+      "num_tables": 4,
+      "table_set_stride": 1
+    }
+  },
+  {
+    "name": "multi_table_constant_time_footprint",
+    "pattern_type": "multi_table_constant_time",
+    "secret_space": 4,
+    "expected_leakage": "low",
+    "defense_group": "multi_table_lookup",
+    "case_type": "program_level_defense",
+    "source_inspiration": "Constant-time mitigation for multi-table lookup: touch all candidate table footprints in a fixed order regardless of the real secret.",
+    "parameters": {
+      "victim_tag": 20,
+      "num_tables": 4,
+      "table_set_stride": 1
+    }
+  },
+  {
+    "name": "branch_no_defense",
+    "pattern_type": "secret_dependent_branch",
+    "secret_space": 4,
+    "expected_leakage": "medium",
+    "defense_group": "branch_footprint",
+    "case_type": "no_defense",
+    "source_inspiration": "Base leakage case: a secret-dependent branch touches one of two code/data regions, leaking the branch direction.",
+    "parameters": {
+      "victim_tag": 30,
+      "false_set": 1,
+      "true_set": 5
+    }
+  },
+  {
+    "name": "branch_balanced_footprint",
+    "pattern_type": "balanced_branch",
+    "secret_space": 4,
+    "expected_leakage": "low",
+    "defense_group": "branch_footprint",
+    "case_type": "program_level_defense",
+    "source_inspiration": "Balanced-footprint mitigation for secret-dependent branch: touch both branch regions in a fixed order regardless of which branch is logically selected.",
+    "parameters": {
+      "victim_tag": 30,
+      "false_set": 1,
+      "true_set": 5
+    }
+  },
+  {
+    "name": "loop_count_no_defense",
+    "pattern_type": "loop_count",
+    "secret_space": 4,
+    "expected_leakage": "high",
+    "defense_group": "loop_count",
+    "case_type": "no_defense",
+    "source_inspiration": "Base leakage case: the number of memory locations touched depends on secret + 1.",
+    "parameters": {
+      "victim_tag": 10
+    }
+  },
+  {
+    "name": "loop_count_fixed_count_padding",
+    "pattern_type": "fixed_loop_count",
+    "secret_space": 4,
+    "expected_leakage": "low",
+    "defense_group": "loop_count",
+    "case_type": "program_level_defense",
+    "source_inspiration": "Fixed-count mitigation for secret-dependent loop count: always touch a fixed number of locations, independent of the secret.",
+    "parameters": {
+      "victim_tag": 10,
+      "fixed_count": 4
+    }
+  }
+]

@@ -1,0 +1,93 @@
+[
+  {
+    "name": "secret_dependent_table_lookup",
+    "pattern_type": "table_lookup",
+    "secret_space": 4,
+    "expected_leakage": "high",
+    "pattern_layer": "victim_program_memory_access",
+    "source_inspiration": "Table-driven cryptographic implementations such as AES T-tables use secret-dependent values to index memory tables; cache attacks can observe which cache sets were touched.",
+    "representative_sources": [
+      "Bernstein, Cache-timing attacks on AES",
+      "Osvik, Shamir, and Tromer, Cache attacks and countermeasures: the case of AES",
+      "Bonneau and Mironov, Cache-collision timing attacks against AES"
+    ],
+    "simplified_pseudocode": "access(table_base + secret * line_size)",
+    "parameters": {
+      "victim_tag": 10
+    },
+    "scenario_role": "vulnerable_victim_pattern"
+  },
+  {
+    "name": "multi_table_lookup_footprint",
+    "pattern_type": "multi_table_lookup",
+    "secret_space": 4,
+    "expected_leakage": "high",
+    "pattern_layer": "victim_program_memory_access",
+    "source_inspiration": "AES-style table-driven code often performs multiple table-like memory accesses during one sensitive operation, creating a wider secret-dependent cache footprint than a single lookup.",
+    "representative_sources": [
+      "Osvik, Shamir, and Tromer, Cache attacks and countermeasures: the case of AES",
+      "Bonneau and Mironov, Cache-collision timing attacks against AES"
+    ],
+    "simplified_pseudocode": "for t in tables: access(table_base[t] + f(secret, t) * line_size)",
+    "parameters": {
+      "victim_tag": 20,
+      "num_tables": 4,
+      "table_set_stride": 1
+    },
+    "scenario_role": "vulnerable_victim_pattern"
+  },
+  {
+    "name": "secret_dependent_branch_footprint",
+    "pattern_type": "secret_dependent_branch",
+    "secret_space": 4,
+    "expected_leakage": "medium",
+    "pattern_layer": "victim_program_control_flow",
+    "source_inspiration": "Constant-time guidance and cache-side-channel analysis identify secret-dependent branches/control flow as a leakage source when different branch paths touch different cache lines.",
+    "representative_sources": [
+      "Constant-time cryptography guidance: avoid secret-dependent branches and memory accesses",
+      "Recent LLC Prime+Probe work against ECDSA-style code paths"
+    ],
+    "simplified_pseudocode": "if secret_bit: access(region_true) else: access(region_false)",
+    "parameters": {
+      "victim_tag": 30,
+      "false_set": 1,
+      "true_set": 5
+    },
+    "scenario_role": "vulnerable_victim_pattern"
+  },
+  {
+    "name": "secret_dependent_loop_count",
+    "pattern_type": "loop_count",
+    "secret_space": 4,
+    "expected_leakage": "high",
+    "pattern_layer": "victim_program_control_flow_and_memory_footprint",
+    "source_inspiration": "Variable-time secret-dependent control flow can change how many memory locations are touched; the cache footprint size can leak secret-dependent information.",
+    "representative_sources": [
+      "Constant-time cryptography guidance: avoid secret-dependent branches and variable memory-access behavior",
+      "Cache side-channel detection work that tracks secret-dependent memory traces"
+    ],
+    "simplified_pseudocode": "for i in range(secret + 1): access(base + i * line_size)",
+    "parameters": {
+      "victim_tag": 10
+    },
+    "scenario_role": "vulnerable_victim_pattern"
+  },
+  {
+    "name": "set_aliasing_table_lookup",
+    "pattern_type": "set_aliasing_lookup",
+    "secret_space": 8,
+    "expected_leakage": "medium",
+    "pattern_layer": "victim_program_memory_access_with_cache_granularity_limit",
+    "source_inspiration": "Prime+Probe observes cache-set disturbance rather than exact addresses. Different logical table entries can alias to the same observed set, producing partial rather than full leakage.",
+    "representative_sources": [
+      "Prime+Probe LLC attacks monitor cache-set activity rather than exact victim addresses",
+      "Cache side-channel analysis literature on cache-set-level observation"
+    ],
+    "simplified_pseudocode": "access(table_base + secret * stride), where multiple secrets map to the same cache set",
+    "parameters": {
+      "victim_tag": 40,
+      "alias_sets": 4
+    },
+    "scenario_role": "vulnerable_victim_pattern"
+  }
+]

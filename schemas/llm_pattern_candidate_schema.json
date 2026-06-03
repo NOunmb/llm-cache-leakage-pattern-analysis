@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "LLM Pattern Extraction Candidate Output",
+  "type": "object",
+  "required": ["source_id", "source_title", "candidates"],
+  "properties": {
+    "source_id": {"type": "string", "minLength": 1},
+    "source_title": {"type": "string", "minLength": 1},
+    "candidates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "candidate_id",
+          "classification",
+          "attack_method_layer",
+          "supported_pattern_type",
+          "simulator_support",
+          "expected_leakage",
+          "recommended_destination"
+        ],
+        "properties": {
+          "candidate_id": {"type": "string", "minLength": 1},
+          "classification": {
+            "type": "string",
+            "enum": [
+              "vulnerable_victim_pattern",
+              "mitigation_candidate",
+              "attack_observation_method_only",
+              "unsupported_or_out_of_scope"
+            ]
+          },
+          "attack_method_layer": {
+            "type": "string",
+            "enum": [
+              "Prime+Probe",
+              "Flush+Reload",
+              "Evict+Time",
+              "Flush+Flush",
+              "general cache timing",
+              "unclear",
+              "not_applicable"
+            ]
+          },
+          "victim_pattern_layer": {"type": ["string", "null"]},
+          "mitigation_layer": {"type": ["string", "null"]},
+          "supported_pattern_type": {
+            "type": ["string", "null"],
+            "enum": [
+              "table_lookup",
+              "multi_table_lookup",
+              "secret_dependent_branch",
+              "loop_count",
+              "set_aliasing_lookup",
+              "constant_time_scan",
+              "random_padding",
+              "balanced_branch",
+              "fixed_loop_count",
+              "multi_table_constant_time",
+              "partitioned_cache",
+              null
+            ]
+          },
+          "simulator_support": {
+            "type": "string",
+            "enum": ["supported", "needs_review", "unsupported"]
+          },
+          "secret_space_suggestion": {"type": ["integer", "null"], "minimum": 2},
+          "expected_leakage": {
+            "type": "string",
+            "enum": ["high", "medium", "low", "unknown"]
+          },
+          "simplified_pseudocode": {"type": ["string", "null"]},
+          "parameter_suggestions": {"type": "object"},
+          "evidence_from_input": {"type": ["string", "null"]},
+          "why_this_fits_prime_probe_simulator": {"type": ["string", "null"]},
+          "limitations": {"type": ["string", "null"]},
+          "recommended_destination": {
+            "type": "string",
+            "enum": [
+              "llm_extracted_patterns.json",
+              "defense_scenarios.json",
+              "paper_sources_only",
+              "reject"
+            ]
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}
